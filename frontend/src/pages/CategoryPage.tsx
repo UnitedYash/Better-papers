@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, ExternalLink, Calendar, Users, AlertCircle } from "lucide-react"
 import { useEffect, useState } from 'react'
 import { api, type Paper } from '@/lib/api'
-import { cleanLatexText } from '@/lib/latex-utils'
+import { LatexRenderer } from '@/components/LatexRenderer'
 
 export function CategoryPage() {
   const { categoryId } = useParams<{ categoryId: string }>()
@@ -160,7 +160,7 @@ export function CategoryPage() {
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
                     <CardTitle className="text-lg leading-tight mb-2 hover:text-primary transition-colors">
-                      {paper.title}
+                      <LatexRenderer text={paper.title} />
                     </CardTitle>
                     
                     <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-2">
@@ -179,9 +179,10 @@ export function CategoryPage() {
               </CardHeader>
               
               <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {cleanLatexText(paper.summary)}
-                </p>
+                <LatexRenderer 
+                  text={paper.summary}
+                  className="text-sm text-muted-foreground leading-relaxed"
+                />
               </CardContent>
             </Card>
           ))}

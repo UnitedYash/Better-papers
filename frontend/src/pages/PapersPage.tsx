@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ExternalLink, Calendar, Users, Search, Filter, AlertCircle } from "lucide-react"
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
-import { cleanLatexText } from '@/lib/latex-utils'
+import { LatexRenderer } from '@/components/LatexRenderer'
 
 interface Paper {
   title: string
@@ -233,7 +233,7 @@ export function PapersPage() {
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
                     <CardTitle className="text-lg leading-tight mb-2 hover:text-primary transition-colors">
-                      {paper.title}
+                      <LatexRenderer text={paper.title} />
                     </CardTitle>
 
                     <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-2">
@@ -258,9 +258,10 @@ export function PapersPage() {
               </CardHeader>
 
               <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {cleanLatexText(paper.summary)}
-                </p>
+                <LatexRenderer
+                  text={paper.summary}
+                  className="text-sm text-muted-foreground leading-relaxed"
+                />
               </CardContent>
             </Card>
           ))}
