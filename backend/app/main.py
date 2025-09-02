@@ -1,29 +1,12 @@
+# app/main.py
 from fastapi import FastAPI
-import requests
-import feedparser
+from app.api import papers  # import the router
 
-app = FastAPI()
+app = FastAPI(title="Better Papers API")
+
+# include the papers router under /papers
+app.include_router(papers.router, prefix="/papers", tags=["papers"])
 
 @app.get("/")
 async def root():
-    url = (
-        "http://export.arxiv.org/api/query?"
-        "search_query=all:machine+learning+AND+cat:cs.LG"
-        "&max_results=10&sortBy=submittedDate&sortOrder=descending"
-    )
-
-    feed = feedparser.parse(url)
-
-    results = [
-        {
-            "title": entry.title,
-            "link": entry.link,
-            "published": entry.published,
-            "abstract": entry.summary
-        }
-        for entry in feed.entries
-    ]
-    for paper in results:
-        print(f"Title: {paper['title']}", flush=True)
-        print(f"Abstract: {paper['abstract']}\n{'-'*80}", flush=True)
-    return {"papers": results}
+    return {"message": "Welcome to Better Papers API!"}
