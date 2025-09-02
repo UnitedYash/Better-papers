@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -8,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ExternalLink, Calendar, Users, Search, Filter, AlertCircle } from "lucide-react"
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
+import { cleanLatexText } from '@/lib/latex-utils'
 
 interface Paper {
   title: string
@@ -160,26 +160,21 @@ export function PapersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">All Papers</h1>
-          <p className="text-muted-foreground text-lg mb-8">
-            Explore the latest research papers from the past 7 days across all categories
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">Research Papers</h1>
+          <p className="text-muted-foreground mb-6">
+            Latest papers from the past 7 days
           </p>
 
           {/* Filters */}
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search papers, authors, or keywords..."
+                placeholder="Search papers..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -187,8 +182,7 @@ export function PapersPage() {
             </div>
 
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-[200px]">
-                <Filter className="mr-2 h-4 w-4" />
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -201,28 +195,24 @@ export function PapersPage() {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-[150px]">
-                <SelectValue placeholder="Sort by" />
+              <SelectTrigger className="w-full sm:w-[120px]">
+                <SelectValue placeholder="Sort" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="date">Latest</SelectItem>
-                <SelectItem value="title">Title A-Z</SelectItem>
+                <SelectItem value="title">Title</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            Showing {filteredPapers.length} of {papers.length} papers
+          <p className="text-sm text-muted-foreground mb-4">
+            {filteredPapers.length} papers
           </p>
-        </motion.div>
+        </div>
 
         {/* Error Message */}
         {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg"
-          >
+          <div className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-destructive" />
               <p className="text-destructive font-medium">
@@ -232,78 +222,52 @@ export function PapersPage() {
             <p className="text-destructive/80 text-sm mt-1">
               {error}. Make sure your FastAPI server is running at localhost:8000.
             </p>
-          </motion.div>
+          </div>
         )}
 
         {/* Papers List */}
-        <div className="space-y-8">
+        <div className="space-y-4">
           {filteredPapers.map((paper, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.05 }}
-              whileHover={{ scale: 1.005 }}
-            >
-              <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-primary/20 hover:border-l-primary">
-                <CardHeader className="pb-4">
-                  <div className="flex justify-between items-start gap-4">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl md:text-2xl leading-tight mb-3 text-foreground hover:text-primary transition-colors">
-                        {paper.title}
-                      </CardTitle>
-                      
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-3">
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-primary" />
-                          <span className="font-medium">{paper.authors.slice(0, 3).join(', ')}{paper.authors.length > 3 ? ` +${paper.authors.length - 3} more` : ''}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-primary" />
-                          <span>{formatDate(paper.published)}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
-                          {getCategoryName(paper.category)}
-                        </Badge>
-                        <Badge variant="outline" className="font-mono text-xs">
-                          {paper.category}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <Button asChild variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground">
-                        <a href={paper.link} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          View Paper
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
+            <Card key={index} className="hover:shadow-md transition-shadow duration-200 border-l-2 border-l-primary/20 hover:border-l-primary">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg leading-tight mb-2 hover:text-primary transition-colors">
+                      {paper.title}
+                    </CardTitle>
 
-                <CardContent className="pt-0">
-                  <div className="bg-muted/30 rounded-lg p-4 border-l-2 border-l-muted-foreground/20">
-                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Abstract</h4>
-                    <p className="text-foreground leading-relaxed text-base">
-                      {paper.summary}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-2">
+                      <span>{paper.authors.slice(0, 2).join(', ')}{paper.authors.length > 2 ? ` +${paper.authors.length - 2}` : ''}</span>
+                      <span>•</span>
+                      <span>{formatDate(paper.published)}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {getCategoryName(paper.category)}
+                      </Badge>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+
+                  <Button asChild variant="outline" size="sm">
+                    <a href={paper.link} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                </div>
+              </CardHeader>
+
+              <CardContent className="pt-0">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {cleanLatexText(paper.summary)}
+                </p>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
         {filteredPapers.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
+          <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
               No papers found matching your criteria.
             </p>
@@ -317,7 +281,7 @@ export function PapersPage() {
             >
               Clear Filters
             </Button>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

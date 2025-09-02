@@ -1,11 +1,11 @@
-import { motion } from 'framer-motion'
 import { useParams, Link } from 'react-router-dom'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ExternalLink, Calendar, Users, AlertCircle } from "lucide-react"
 import { useEffect, useState } from 'react'
 import { api, type Paper } from '@/lib/api'
+import { cleanLatexText } from '@/lib/latex-utils'
 
 export function CategoryPage() {
   const { categoryId } = useParams<{ categoryId: string }>()
@@ -113,42 +113,33 @@ export function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <Button asChild variant="ghost" className="mb-4">
+        <div className="mb-6">
+          <Button asChild variant="ghost" size="sm" className="mb-3">
             <Link to="/categories">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Categories
+              Back
             </Link>
           </Button>
 
-          <div className="flex items-center gap-4 mb-4">
-            <h1 className="text-4xl md:text-5xl font-bold">
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-3xl font-bold">
               {categoryNames[categoryId || ''] || categoryId}
             </h1>
-            <Badge variant="outline" className="font-mono">
+            <Badge variant="outline" className="font-mono text-xs">
               {categoryId}
             </Badge>
           </div>
 
-          <p className="text-muted-foreground text-lg">
-            Latest papers from the past 7 days • {papers.length} papers found
+          <p className="text-muted-foreground">
+            {papers.length} papers from the past 7 days
           </p>
-        </motion.div>
+        </div>
 
         {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg"
-          >
+          <div className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-destructive" />
               <p className="text-destructive font-medium">
@@ -158,73 +149,50 @@ export function CategoryPage() {
             <p className="text-destructive/80 text-sm mt-1">
               Could not connect to backend API at localhost:8000. Make sure your FastAPI server is running. Showing sample data instead.
             </p>
-          </motion.div>
+          </div>
         )}
 
         {/* Papers List */}
-        <div className="space-y-8">
+        <div className="space-y-4">
           {papers.map((paper, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ scale: 1.005 }}
-            >
-              <Card className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-primary/20 hover:border-l-primary">
-                <CardHeader className="pb-4">
-                  <div className="flex justify-between items-start gap-4">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl md:text-2xl leading-tight mb-3 text-foreground hover:text-primary transition-colors">
-                        {paper.title}
-                      </CardTitle>
-                      
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-2">
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-primary" />
-                          <span className="font-medium">{paper.authors.slice(0, 3).join(', ')}{paper.authors.length > 3 ? ` +${paper.authors.length - 3} more` : ''}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-primary" />
-                          <span>{formatDate(paper.published)}</span>
-                        </div>
-                      </div>
-                    </div>
+            <Card key={index} className="hover:shadow-md transition-shadow duration-200 border-l-2 border-l-primary/20 hover:border-l-primary">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg leading-tight mb-2 hover:text-primary transition-colors">
+                      {paper.title}
+                    </CardTitle>
                     
-                    <div className="flex flex-col gap-2">
-                      <Button asChild variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground">
-                        <a href={paper.link} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          View Paper
-                        </a>
-                      </Button>
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-2">
+                      <span>{paper.authors.slice(0, 2).join(', ')}{paper.authors.length > 2 ? ` +${paper.authors.length - 2}` : ''}</span>
+                      <span>•</span>
+                      <span>{formatDate(paper.published)}</span>
                     </div>
                   </div>
-                </CardHeader>
-                
-                <CardContent className="pt-0">
-                  <div className="bg-muted/30 rounded-lg p-4 border-l-2 border-l-muted-foreground/20">
-                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Abstract</h4>
-                    <p className="text-foreground leading-relaxed text-base">
-                      {paper.summary}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                  
+                  <Button asChild variant="outline" size="sm">
+                    <a href={paper.link} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="pt-0">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {cleanLatexText(paper.summary)}
+                </p>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
         {papers.length === 0 && !loading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
+          <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
               No papers found for this category in the past 7 days.
             </p>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

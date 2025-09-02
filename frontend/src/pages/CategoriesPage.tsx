@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -110,22 +109,17 @@ export function CategoriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Research Categories</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
-            Explore papers across different fields of study. Find the latest research in your area of interest.
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Categories</h1>
+          <p className="text-muted-foreground mb-6">
+            Browse research by field of study
           </p>
           
           {/* Search */}
-          <div className="relative max-w-md mx-auto">
+          <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Search categories..."
@@ -134,15 +128,11 @@ export function CategoriesPage() {
               className="pl-10"
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* Error Message */}
         {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg"
-          >
+          <div className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-destructive" />
               <p className="text-destructive font-medium">
@@ -152,61 +142,37 @@ export function CategoriesPage() {
             <p className="text-destructive/80 text-sm mt-1">
               Could not fetch categories from backend API. Make sure your FastAPI server is running. Showing all available categories instead.
             </p>
-          </motion.div>
+          </div>
         )}
 
         {/* Categories by Field */}
-        {Object.entries(groupedCategories).map(([field, categories], fieldIndex) => (
-          <motion.div
-            key={field}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: fieldIndex * 0.1 }}
-            className="mb-12"
-          >
-            <h2 className="text-2xl font-semibold mb-6 text-primary">{field}</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categories.map((category, index) => (
-                <motion.div
-                  key={category.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: (fieldIndex * 0.1) + (index * 0.05) }}
-                  whileHover={{ 
-                    scale: 1.02,
-                    transition: { type: "spring", stiffness: 300, damping: 20 }
-                  }}
-                >
-                  <Link to={`/category/${category.id}`}>
-                    <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 h-full">
-                      <CardHeader>
-                        <div className="flex justify-between items-start">
-                          <CardTitle className="text-lg">{category.name}</CardTitle>
-                          <Badge variant="secondary">Available</Badge>
-                        </div>
-                        <CardDescription>{category.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Badge variant="outline" className="font-mono text-xs">
-                          {category.id}
-                        </Badge>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                </motion.div>
+        {Object.entries(groupedCategories).map(([field, categories]) => (
+          <div key={field} className="mb-8">
+            <h2 className="text-xl font-semibold mb-4 text-primary">{field}</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {categories.map((category) => (
+                <Link key={category.id} to={`/category/${category.id}`}>
+                  <Card className="cursor-pointer hover:shadow-md transition-shadow duration-200 h-full border-l-2 border-l-primary/20 hover:border-l-primary">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">{category.name}</CardTitle>
+                      <CardDescription className="text-sm">{category.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <Badge variant="outline" className="font-mono text-xs">
+                        {category.id}
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
-          </motion.div>
+          </div>
         ))}
 
         {filteredCategories.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
+          <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No categories found matching your search.</p>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>
