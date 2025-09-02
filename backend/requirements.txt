@@ -6,3 +6,4 @@ pydantic
 requests
 feedparser
 python-dateutil
+boto3[crt]
