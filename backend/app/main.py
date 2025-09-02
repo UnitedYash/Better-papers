@@ -1,12 +1,11 @@
 # app/main.py
 from fastapi import FastAPI
-from app.api import papers  # import the router
+from app.api import s3_papers
 
 app = FastAPI(title="Better Papers API")
 
-# include the papers router under /papers
-app.include_router(papers.router, prefix="/papers", tags=["papers"])
+app.include_router(s3_papers.router, prefix="/papers")
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Better Papers API!"}
+    return {"message": "Welcome to Better Papers Papers!"}
