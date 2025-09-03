@@ -1,6 +1,0 @@
-../../../../../../../../../../Users/ayyashanhardeen/Library/Caches/com.apple.python/private/var/folders/5j/hp1swqw510jbfl47qg3_5wnh0000gn/T/pip-target-u4uqlc5e/lib/python/sgmllib.cpython-39.pyc
-../sgmllib.py
-PKG-INFO
-SOURCES.txt
-dependency_links.txt
-top_level.txt
