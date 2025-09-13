@@ -128,8 +128,9 @@ export function WeeklyTrendsChart({ width = 800, height = 400 }: WeeklyTrendsCha
 
     // Add grid lines
     const xAxis = d3.axisBottom(xScale)
-      .tickFormat(d3.timeFormat('%a %d'))
-      .ticks(7)
+    .tickFormat((d, i) => d3.timeFormat('%a %d')(d as any))
+    .ticks(7)
+
 
     const yAxis = d3.axisLeft(yScale)
       .tickSize(-innerWidth)

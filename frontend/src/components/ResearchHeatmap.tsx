@@ -169,7 +169,12 @@ export function ResearchHeatmap({ width = 800, height = 200 }: ResearchHeatmapPr
       .text(d => d)
 
     // Add month labels
-    const months = []
+    interface MonthWeek {
+      month: string
+      week: number
+    }
+
+    const months: MonthWeek[] = []
     let currentMonth = data[0].date.getMonth()
     let currentWeek = 0
     
