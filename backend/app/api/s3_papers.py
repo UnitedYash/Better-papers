@@ -11,6 +11,14 @@ AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = os.environ.get("AWS_DEFAULT_REGION")
 
+# Sanity checks for missing environment variables
+if not BUCKET_NAME:
+    raise RuntimeError("BUCKET_NAME environment variable is missing")
+if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
+    raise RuntimeError("AWS credentials are missing")
+if not AWS_REGION:
+    raise RuntimeError("AWS_DEFAULT_REGION is missing")
+
 # Create S3 client using environment variables
 s3_client = boto3.client(
     "s3",
@@ -38,7 +46,8 @@ async def get_papers_from_s3(category: str):
     key = f"{category}.json"
     try:
         obj = s3_client.get_object(Bucket=BUCKET_NAME, Key=key)
-        data = json.loads(obj["Body"].read())
+        # decode bytes to string before loading JSON
+        data = json.loads(obj["Body"].read().decode("utf-8"))
         return {"category": category, "papers": data}
     except s3_client.exceptions.NoSuchKey:
         raise HTTPException(status_code=404, detail="Category not found")
