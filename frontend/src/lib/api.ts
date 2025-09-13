@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://better-papers.onrender.com/'
+const API_BASE_URL = 'https://better-papers.onrender.com'
 
 export interface Paper {
   title: string
